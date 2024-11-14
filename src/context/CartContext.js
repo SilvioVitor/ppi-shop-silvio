@@ -37,18 +37,18 @@ export default function CartContextProvider({ children }) {
         if (action.type === "ADD_ITEM") {
             const updatedItems = [...state.items];
 
-            const existingCartIndex = updatedItems.findIndex(
+            const existingCartItemIndex = updatedItems.findIndex(
                 (item) => item.id === action.payload.id
             );
 
-            const existingcartItem = updatedItems[existingCartIndex];
-
-            if (existingcartItem) {
+            const existingCartItem = updatedItems[existingCartItemIndex];
+            console.log(existingCartItem)
+            if (existingCartItem) {
                 const updatedItem = {
-                    ...existingcartItem,
-                    quantity: existingcartItem.quantity + 1,
+                    ...existingCartItem,
+                    quantity: existingCartItem.quantity + 1,
                 }
-                updatedItems[existingCartIndex] = updatedItem;
+                updatedItems[existingCartItemIndex] = updatedItem;
             } else {
                 const product = action.payload.products.find(
                     (i) => i.id === action.payload.id
@@ -74,7 +74,7 @@ export default function CartContextProvider({ children }) {
 
             const updatedItem = { ...updatedItems[updatedItemIndex] }
 
-            updatedItem.quantity += action.payload.amount;
+            updatedItem.quantity -= action.payload.amount;
 
             if (updatedItem.quantity < 1) {
                 updatedItems.splice(updatedItemIndex, 1);
@@ -96,14 +96,14 @@ export default function CartContextProvider({ children }) {
 
     function handleAddToCart(id) {
         cartDispatch({
-            type: "ADD-ITEM",
+            type: "ADD_ITEM",
             payload: { id, products }
         });
     };
 
     function handleupdateCartItemQuantity(id, amount) {
         cartDispatch({
-            type: "UPTADE-ITEM",
+            type: "UPDATE_ITEM",
             payload: { id, amount }
         });
     };
