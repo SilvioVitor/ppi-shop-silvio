@@ -5,6 +5,7 @@ export const CartContext = createContext({
     products: [],
     loading: false,
     error: "",
+    valorTotal: {},
     addItemToCart: () => { },
     updateItemQuantity: () => { }
 });
@@ -14,6 +15,7 @@ export default function CartContextProvider({ children }) {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [valorTotal, setValorTotal] = useState(0.00);
 
     useEffect(() => {
         async function fetchProducts() {
@@ -40,15 +42,19 @@ export default function CartContextProvider({ children }) {
             const existingCartItemIndex = updatedItems.findIndex(
                 (item) => item.id === action.payload.id
             );
-
+            
             const existingCartItem = updatedItems[existingCartItemIndex];
+            
+
             console.log(existingCartItem)
             if (existingCartItem) {
                 const updatedItem = {
                     ...existingCartItem,
-                    quantity: existingCartItem.quantity + 1,
+                    quantity: existingCartItem.quantity + 1
                 }
                 updatedItems[existingCartItemIndex] = updatedItem;
+                setValorTotal(valorTotal + existingCartItem.price)
+
             } else {
                 const product = action.payload.products.find(
                     (i) => i.id === action.payload.id
@@ -60,8 +66,9 @@ export default function CartContextProvider({ children }) {
                     price: product.price,
                     quantity: 1
                 })
+                setValorTotal(valorTotal + product.price)
             }
-
+            
             return { items: updatedItems };
         }
 
@@ -74,7 +81,10 @@ export default function CartContextProvider({ children }) {
 
             const updatedItem = { ...updatedItems[updatedItemIndex] }
 
+            setValorTotal(valorTotal - updatedItem.price)
+
             updatedItem.quantity -= action.payload.amount;
+            
 
             if (updatedItem.quantity < 1) {
                 updatedItems.splice(updatedItemIndex, 1);
@@ -83,9 +93,9 @@ export default function CartContextProvider({ children }) {
             }
 
             return { ...state, items: updatedItems };
-
+            
         }
-
+        
         return state;
     }
 
@@ -94,10 +104,10 @@ export default function CartContextProvider({ children }) {
         { items: [] }
     );
 
-    function handleAddToCart(id) {
+    function handleAddToCart(id, amount) {
         cartDispatch({
             type: "ADD_ITEM",
-            payload: { id, products }
+            payload: { id, products, amount }
         });
     };
 
@@ -113,6 +123,7 @@ export default function CartContextProvider({ children }) {
         products: products,
         loading: loading,
         error: error,
+        valorTotal: valorTotal,
         addItemToCart: handleAddToCart,
         updateItemQuantity: handleupdateCartItemQuantity
     };
