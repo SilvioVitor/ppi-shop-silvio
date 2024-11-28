@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useReducer } from "react";
+import { supabase } from "../utils/supabase";
 
 export const CartContext = createContext({
     items: [],
@@ -18,19 +19,33 @@ export default function CartContextProvider({ children }) {
     const [valorTotal, setValorTotal] = useState(0.00);
 
     useEffect(() => {
-        async function fetchProducts() {
-            setLoading(true);
-            const response = await fetch("https://dummyjson.com/products/category/motorcycle?limit=12&select=id,thumbnail,title,price,description");
-            if (response.ok) {
-                const result = await response.json();
-                setProducts(result.products);
-            } else {
-                setError("Fetch FAILED!");
-            }
-            setLoading(false);
-        }
 
-        fetchProducts();
+        async function getProducts() {
+            setLoading(true);
+            const { data: products, error } = await supabase.from("products").select();
+
+            if(products.length > 0){
+                setProducts(products);
+            } else {
+                setError(`Fetcing products failed ${error}`)
+            }
+            setLoading(false)
+        }
+        getProducts();
+
+       // async function fetchProducts() {
+      //      setLoading(true);
+        //    const response = await fetch("https://dummyjson.com/products/category/motorcycle?limit=12&select=id,thumbnail,title,price,description");
+        //    if (response.ok) {
+        //        const result = await response.json();
+       //         setProducts(result.products);
+       //     } else {
+        //        setError("Fetch FAILED!");
+       //     }
+       //     setLoading(false);
+       // }
+
+      //  fetchProducts();
     }, []);
 
     //SHOPPING CART

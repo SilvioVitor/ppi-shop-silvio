@@ -345,3 +345,7 @@ h1 {
   padding-top: 3rem;
   gap: 3rem;
 }
+
+.cartItem {
+  height: auto;
+}
